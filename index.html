@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rei dos VS - Plataforma Oficial</title>
+    <style>
+        :root {
+            --bg-purple: #120726;
+            --card-purple: #260d47;
+            --gold-primary: #ffb700;
+            --gold-gradient: linear-gradient(135deg, #ffe066 0%, #ff9900 100%);
+            --text-light: #ffffff;
+            --subtext: #d1c4e9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--bg-purple); color: var(--text-light); min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* NAVBAR */
+        nav { display: none; justify-content: space-between; align-items: center; padding: 1rem 5%; background: rgba(0,0,0,0.6); border-bottom: 2px solid var(--gold-primary); }
+        .logo { font-weight: bold; font-size: 1.5rem; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+        .nav-links a { color: var(--text-light); text-decoration: none; font-weight: 500; cursor: pointer; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold-primary); }
+        .btn-logout { background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 0.4rem 1rem; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+        .container { padding: 2rem 5%; max-width: 1200px; margin: 0 auto; width: 100%; flex: 1; }
+        .page-content { display: none; }
+        .active-page { display: block !important; }
+
+        /* TELA DE LOGIN */
+        .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 75vh; }
+        .auth-container { width: 100%; max-width: 420px; background: var(--card-purple); padding: 2.5rem; border-radius: 15px; border: 2px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
+        .auth-header { text-align: center; margin-bottom: 2rem; }
+        .auth-header h1 { color: var(--gold-primary); font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .auth-header p { color: var(--subtext); font-size: 0.9rem; margin-top: 0.5rem; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--subtext); }
+        .form-group input { width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.4); color: #fff; outline: none; }
+        .form-group input:focus { border-color: var(--gold-primary); }
+
+        .forgot-link { font-size: 0.85rem; color: var(--gold-primary); cursor: pointer; display: block; margin-top: 0.8rem; text-align: right; text-decoration: underline; }
+        
+        .btn-gold { background: var(--gold-gradient); color: #000; border: none; padding: 0.8rem 1.5rem; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 1rem; transition: transform 0.2s; }
+        .btn-gold:hover { transform: scale(1.02); }
+
+        /* GRID DA LOJA */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 1.5rem; }
+        .product-card { background: var(--card-purple); border: 1px solid var(--gold-primary); border-radius: 15px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-title { font-size: 1.2rem; color: var(--gold-primary); font-weight: bold; margin-bottom: 0.5rem; }
+        .product-artist { color: var(--subtext); font-size: 0.9rem; margin-bottom: 1rem; }
+        
+        .option-group { margin: 1rem 0; background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; }
+        .option-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; cursor: pointer; }
+        
+        .price-tag { font-size: 1.4rem; color: var(--gold-primary); font-weight: bold; text-align: center; margin: 1rem 0; }
+
+        /* LISTA DE DOWNLOADS */
+        .download-item { background: var(--card-purple); border: 1px solid var(--gold-primary); padding: 1rem; border-radius: 10px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .btn-download { background: var(--gold-gradient); color: #000; padding: 0.5rem 1rem; border-radius: 8px; font-weight: bold; text-decoration: none; }
+
+        /* CHATBOT */
+        .chat-widget { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        .chat-button { background: var(--gold-gradient); border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 1.8rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .chat-box { display: none; position: absolute; bottom: 70px; right: 0; width: 320px; height: 400px; background: var(--card-purple); border: 2px solid var(--gold-primary); border-radius: 15px; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
+        .chat-header { background: rgba(0,0,0,0.6); padding: 0.8rem; font-weight: bold; color: var(--gold-primary); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .msg-bot { background: rgba(255,255,255,0.1); padding: 0.6rem; border-radius: 8px; align-self: flex-start; max-width: 85%; }
+        .msg-user { background: var(--gold-primary); color: #000; padding: 0.6rem; border-radius: 8px; align-self: flex-end; max-width: 85%; font-weight: 500; }
+        .chat-input-area { display: flex; padding: 0.5rem; background: rgba(0,0,0,0.4); }
+        .chat-input-area input { flex: 1; padding: 0.5rem; border-radius: 4px; border: none; outline: none; }
+        .chat-input-area button { background: var(--gold-primary); border: none; padding: 0.5rem 0.8rem; margin-left: 0.5rem; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <nav id="mainNav">
+        <div class="logo">👑 Rei dos VS</div>
+        <ul class="nav-links">
+            <li><a onclick="showPage('store')">Loja de VS</a></li>
+            <li><a onclick="showPage('downloads')">Meus Downloads (<span id="dl-count">0</span>)</a></li>
+        </ul>
+        <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+    </nav>
+
+    <div class="container">
+
+        <div id="loginPage" class="page-content active-page">
+            <div class="auth-wrapper">
+                <div class="auth-container" id="loginCard">
+                    <div class="auth-header">
+                        <h1>👑 Rei dos VS</h1>
+                        <p>Acesse sua conta para ver seus Playbacks e VS</p>
+                    </div>
+                    <form onsubmit="fazerLogin(event)">
+                        <div class="form-group">
+                            <label>E-mail</label>
+                            <input type="email" placeholder="seuemail@exemplo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Senha</label>
+                            <input type="password" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-gold">ENTRAR NA PLATAFORMA</button>
+                        <span class="forgot-link" onclick="toggleForgot(true)">Esqueceu a senha?</span>
+                    </form>
+                </div>
+
+                <div class="auth-container" id="forgotCard" style="display: none;">
+                    <div class="auth-header">
+                        <h1 style="font-size: 1.4rem;">Recuperar Acesso</h1>
+                        <p>Digite seu e-mail para receber o código de acesso</p>
+                    </div>
+                    <form onsubmit="enviarCodigoRecuperacao(event)">
+                        <div class="form-group">
+                            <label>E-mail Cadastrado</label>
+                            <input type="email" placeholder="seuemail@exemplo.com" required>
+                        </div>
+                        <button type="submit" class="btn-gold">ENVIAR CÓDIGO POR E-MAIL</button>
+                        <span class="forgot-link" style="text-align: center; margin-top: 1rem;" onclick="toggleForgot(false)">Voltar para o Login</span>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="store" class="page-content">
+            <h2 style="color: var(--gold-primary);">Catálogo de Playbacks & VS</h2>
+            <p style="color: var(--subtext); margin-bottom: 1rem;">Escolha a música e selecione Playback Simples ou VS Multitrack:</p>
+            
+            <div class="products-grid" id="catalog"></div>
+        </div>
+
+        <div id="downloads" class="page-content">
+            <h2 style="color: var(--gold-primary); margin-bottom: 0.5rem;">Seus Arquivos Adquiridos</h2>
+            <p style="color: var(--subtext); margin-bottom: 1.5rem;">Seus downloads ficam salvos permanentemente abaixo:</p>
+            <div id="downloads-list">
+                <p id="empty-msg" style="color: var(--subtext);">Você ainda não realizou nenhuma compra neste teste.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="chat-widget" id="chatWidget">
+        <button class="chat-button" onclick="toggleChat()">💬</button>
+        <div class="chat-box" id="chatBox">
+            <div class="chat-header">Suporte Automático Rei dos VS</div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="msg-bot">Olá! Sou o assistente virtual do Rei dos VS. Como posso te ajudar?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Digite sua dúvida...">
+                <button onclick="sendChatMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const musicasTeste = [
+            {
+                id: 1,
+                titulo: "Adoro",
+                artista: "Banda Magníficos",
+                demoAudio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                playbackLink: "https://drive.google.com/file/d/SEU_LINK_PLAYBACK_ADORO/view",
+                vsLink: "https://drive.google.com/file/d/SEU_LINK_VS_ADORO/view"
+            },
+            {
+                id: 2,
+                titulo: "Me Usa",
+                artista: "Banda Magníficos",
+                demoAudio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                playbackLink: "https://drive.google.com/file/d/SEU_LINK_PLAYBACK_ME_USA/view",
+                vsLink: "https://drive.google.com/file/d/SEU_LINK_VS_ME_USA/view"
+            }
+        ];
+
+        let downloadsUsuario = [];
+
+        function fazerLogin(e) {
+            e.preventDefault();
+            document.getElementById('loginPage').classList.remove('active-page');
+            document.getElementById('mainNav').style.display = 'flex';
+            document.getElementById('chatWidget').style.display = 'block';
+            
+            carregarCatalogo();
+            showPage('store');
+        }
+
+        function fazerLogout() {
+            document.getElementById('mainNav').style.display = 'none';
+            document.getElementById('chatWidget').style.display = 'none';
+            showPage('loginPage');
+        }
+
+        function toggleForgot(show) {
+            document.getElementById('loginCard').style.display = show ? 'none' : 'block';
+            document.getElementById('forgotCard').style.display = show ? 'block' : 'none';
+        }
+
+        function enviarCodigoRecuperacao(e) {
+            e.preventDefault();
+            alert("Um código de validação foi enviado para o seu e-mail!");
+            toggleForgot(false);
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
+            document.getElementById(pageId).classList.add('active-page');
+        }
+
+        function carregarCatalogo() {
+            const catalogDiv = document.getElementById('catalog');
+            catalogDiv.innerHTML = '';
+
+            musicasTeste.forEach(musica => {
+                catalogDiv.innerHTML += `
+                    <div class="product-card">
+                        <div>
+                            <div class="product-title">${musica.titulo}</div>
+                            <div class="product-artist">${musica.artista}</div>
+                            
+                            <label style="font-size:0.8rem; color:var(--subtext);">Ouvir demonstração:</label>
+                            <audio controls style="width:100%; margin:0.5rem 0 1rem 0; height:35px;">
+                                <source src="${musica.demoAudio}" type="audio/mpeg">
+                            </audio>
+
+                            <div class="option-group">
+                                <div class="option-label">
+                                    <label>
+                                        <input type="radio" name="versao-${musica.id}" value="playback" checked onclick="atualizarPreco(${musica.id}, 20)">
+                                        Playback Simples
+                                    </label>
+                                    <span>R$ 20,00</span>
+                                </div>
+                                <div class="option-label">
+                                    <label>
+                                        <input type="radio" name="versao-${musica.id}" value="vs" onclick="atualizarPreco(${musica.id}, 30)">
+                                        VS Multitrack ZIP
+                                    </label>
+                                    <span>R$ 30,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="price-tag" id="preco-${musica.id}">R$ 20,00</div>
+                            <button class="btn-gold" onclick="processarCompra(${musica.id})">Comprar via Pix / Cartão</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function atualizarPreco(musicaId, valor) {
+            document.getElementById(`preco-${musicaId}`).innerText = `R$ ${valor},00`;
+        }
+
+        function processarCompra(musicaId) {
+            const musica = musicasTeste.find(m => m.id === musicaId);
+            const opcaoSelecionada = document.querySelector(`input[name="versao-${musicaId}"]:checked`).value;
+            
+            const isVS = opcaoSelecionada === 'vs';
+            const preco = isVS ? 30 : 20;
+            const tipoNome = isVS ? "VS Multitrack" : "Playback Simples";
+            const linkDownload = isVS ? musica.vsLink : musica.playbackLink;
+
+            alert(`Simulação Mercado Pago:\n\nGerando Pix de R$ ${preco},00 para a compra de:\n"${musica.titulo} - ${musica.artista} (${tipoNome})"\n\nApós o pagamento, o download é liberado automaticamente!`);
+
+            downloadsUsuario.push({
+                titulo: `${musica.titulo} (${tipoNome})`,
+                artista: musica.artista,
+                link: linkDownload
+            });
+
+            atualizarDownloads();
+            showPage('downloads');
+        }
+
+        function atualizarDownloads() {
+            const listDiv = document.getElementById('downloads-list');
+            document.getElementById('dl-count').innerText = downloadsUsuario.length;
+
+            if(downloadsUsuario.length > 0) {
+                listDiv.innerHTML = '';
+                downloadsUsuario.forEach(item => {
+                    listDiv.innerHTML += `
+                        <div class="download-item">
+                            <div>
+                                <strong>${item.titulo}</strong>
+                                <p style="font-size:0.8rem; color:var(--subtext);">${item.artista}</p>
+                            </div>
+                            <a href="${item.link}" target="_blank" class="btn-download">⬇️ Baixar do Google Drive</a>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function toggleChat() {
+            const chat = document.getElementById('chatBox');
+            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const msgs = document.getElementById('chatMessages');
+            if(!input.value.trim()) return;
+
+            const userText = input.value;
+            msgs.innerHTML += `<div class="msg-user">${userText}</div>`;
+            input.value = '';
+
+            setTimeout(() => {
+                let botReply = "Para falar com o suporte humano, entre em contato no WhatsApp: (89) 99430-1618.";
+                const lower = userText.toLowerCase();
+                if(lower.includes('pix') || lower.includes('cartao') || lower.includes('pagamento')) {
+                    botReply = "Aceitamos Pix com liberação imediata e Cartão de Crédito via Mercado Pago!";
+                } else if(lower.includes('perdi') || lower.includes('download') || lower.includes('onde')) {
+                    botReply = "Seus arquivos ficam salvos na aba 'Meus Downloads' no topo da tela após entrar na conta.";
+                }
+                msgs.innerHTML += `<div class="msg-bot">${botReply}</div>`;
+                msgs.scrollTop = msgs.scrollHeight;
+            }, 600);
+        }
+    </script>
+</body>
+</html>
